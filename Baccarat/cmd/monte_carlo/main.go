@@ -272,11 +272,11 @@ func main() {
 	// Define command-line arguments
 	playerName := flag.String("name", "Player", "Player's name")
 	initialBet := flag.Int("bet", 100, "Initial bet value")
-	initialBalance := flag.Int("balance", 1000, "Player's balance (optional)")
+	initialBalance := flag.Int("balance", 5000, "Player's balance (optional)")
 	numSimulations := flag.Int("simulations", 10000, "Number of simulations to run")
 	tableLimit := flag.Int("tablelimit", 1000, "Table limit for betting")
 	numDecks := flag.Int("decks", 8, "Number of decks in the shoe")
-	houseEdge := flag.Float("houseEdge", 0.95, "Number of decks in the shoe")
+	houseEdge := flag.Float64("houseEdge", 0.95, "Number of decks in the shoe")
 
 	flag.Parse()
 
