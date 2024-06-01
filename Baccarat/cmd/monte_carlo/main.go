@@ -95,40 +95,48 @@ func dealInitialHands(deck *Deck) (Hand, Hand) {
 	return playerHand, bankerHand
 }
 
-// Determine if a hand should draw a third card based on Baccarat rules
-func shouldDrawThirdCard(handValue int, otherHandValue int, isPlayer bool) bool {
-	if handValue <= 5 && isPlayer {
+// Determine if the player should draw a third card
+func playerShouldDraw(handValue int) bool {
+	return handValue <= 5
+}
+
+// Determine if the banker should draw a third card
+func bankerShouldDraw(bankerValue, playerValue, playerThirdCardValue int, playerDraws bool) bool {
+	if !playerDraws {
+		return bankerValue <= 5
+	}
+
+	switch bankerValue {
+	case 0, 1, 2:
 		return true
+	case 3:
+		return playerThirdCardValue != 8
+	case 4:
+		return playerThirdCardValue >= 2 && playerThirdCardValue <= 7
+	case 5:
+		return playerThirdCardValue >= 4 && playerThirdCardValue <= 7
+	case 6:
+		return playerThirdCardValue == 6 || playerThirdCardValue == 7
+	default:
+		return false
 	}
-	if !isPlayer {
-		if handValue <= 2 {
-			return true
-		}
-		switch handValue {
-		case 3:
-			return otherHandValue != 8
-		case 4:
-			return otherHandValue >= 2 && otherHandValue <= 7
-		case 5:
-			return otherHandValue >= 4 && otherHandValue <= 7
-		case 6:
-			return otherHandValue == 6 || otherHandValue == 7
-		}
-	}
-	return false
 }
 
 // Deal third card based on Baccarat rules
 func dealThirdCard(deck *Deck, playerHand, bankerHand *Hand) {
 	playerValue := playerHand.Value()
 	bankerValue := bankerHand.Value()
+	playerDraws := false
+	playerThirdCardValue := -1
 
-	if shouldDrawThirdCard(playerValue, bankerValue, true) {
+	if playerShouldDraw(playerValue) {
 		playerHand.Cards = append(playerHand.Cards, deck.Draw())
+		playerDraws = true
+		playerThirdCardValue = playerHand.Cards[2].Value
 		playerValue = playerHand.Value()
 	}
 
-	if shouldDrawThirdCard(bankerValue, playerValue, false) {
+	if bankerShouldDraw(bankerValue, playerValue, playerThirdCardValue, playerDraws) {
 		bankerHand.Cards = append(bankerHand.Cards, deck.Draw())
 	}
 }
@@ -275,8 +283,8 @@ func main() {
 	initialBalance := flag.Int("balance", 5000, "Player's balance (optional)")
 	numSimulations := flag.Int("simulations", 10000, "Number of simulations to run")
 	tableLimit := flag.Int("tablelimit", 1000, "Table limit for betting")
-	numDecks := flag.Int("decks", 8, "Number of decks in the shoe")
-	houseEdge := flag.Float64("houseEdge", 0.95, "Number of decks in the shoe")
+	numDecks := flag.Int("decks", 6, "Number of decks in the shoe")
+	houseEdge := flag.Float64("houseEdge", 0.95, "House edge for Banker bet wins")
 
 	flag.Parse()
 
