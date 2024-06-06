@@ -126,6 +126,12 @@ func bankerShouldDraw(bankerValue, playerValue, playerThirdCardValue int, player
 func dealThirdCard(deck *Deck, playerHand, bankerHand *Hand) {
 	playerValue := playerHand.Value()
 	bankerValue := bankerHand.Value()
+
+	// Natural win check
+	if playerValue == 8 || playerValue == 9 || bankerValue == 8 || bankerValue == 9 {
+		return
+	}
+
 	playerDraws := false
 	playerThirdCardValue := -1
 
@@ -280,9 +286,9 @@ func main() {
 	// Define command-line arguments
 	playerName := flag.String("name", "Player", "Player's name")
 	initialBet := flag.Int("bet", 100, "Initial bet value")
-	initialBalance := flag.Int("balance", 5000, "Player's balance (optional)")
-	numSimulations := flag.Int("simulations", 10000, "Number of simulations to run")
-	tableLimit := flag.Int("tablelimit", 1000, "Table limit for betting")
+	initialBalance := flag.Int("balance", 10_000, "Player's balance (optional)")
+	numSimulations := flag.Int("simulations", 100_000, "Number of simulations to run")
+	tableLimit := flag.Int("tablelimit", 2000, "Table limit for betting")
 	numDecks := flag.Int("decks", 6, "Number of decks in the shoe")
 	houseEdge := flag.Float64("houseEdge", 0.95, "House edge for Banker bet wins")
 
